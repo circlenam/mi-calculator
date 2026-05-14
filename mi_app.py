@@ -6,17 +6,17 @@ import pandas as pd
 import plotly.graph_objects as go
 
 # ============================================================
-# 페이지 설정
+# 페이지 설정 (사이드바 완전 제거)
 # ============================================================
 st.set_page_config(
     page_title="MI Calculator",
     page_icon="🧪",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # ============================================================
-# 커스텀 CSS (다크모드 + 보라/시안 네온)
+# 커스텀 CSS
 # ============================================================
 st.markdown("""
 <style>
@@ -24,7 +24,7 @@ st.markdown("""
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 
-/* 상단 헤더는 유지하되 투명화 */
+/* 상단 헤더 투명화 */
 [data-testid="stHeader"] {
     background: transparent !important;
     height: 0px !important;
@@ -42,34 +42,25 @@ footer {visibility: hidden;}
     display: none !important;
 }
 
-/* ===== 사이드바를 항상 펼친 상태로 고정 ===== */
-[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #1e1b4b 0%, #0f172a 100%) !important;
-    border-right: 1px solid rgba(168, 85, 247, 0.3) !important;
-    min-width: 320px !important;
-    max-width: 320px !important;
-    transform: none !important;
-    visibility: visible !important;
-    display: block !important;
-    position: relative !important;
-}
-[data-testid="stSidebar"][aria-expanded="false"] {
-    margin-left: 0px !important;
-    transform: none !important;
-}
-[data-testid="stSidebar"] * {
-    color: #e2e8f0 !important;
-}
-
-/* 사이드바 내부 닫기(X) 버튼 숨기기 - 항상 펼침이므로 불필요 */
+/* ===== 사이드바 완전 제거 ===== */
+[data-testid="stSidebar"],
 [data-testid="stSidebarCollapseButton"],
-[data-testid="stSidebarCollapsedControl"] {
+[data-testid="stSidebarCollapsedControl"],
+[data-testid="collapsedControl"] {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0px !important;
+}
+section[data-testid="stSidebar"] {
     display: none !important;
 }
 
-/* 사이드바 내부 컨텐츠 패딩 */
-[data-testid="stSidebarContent"] {
-    padding-top: 1rem !important;
+/* 메인 컨텐츠 전체 너비 사용 */
+.main .block-container {
+    max-width: 100% !important;
+    padding-left: 3rem !important;
+    padding-right: 3rem !important;
+    padding-top: 2rem !important;
 }
 
 /* ===== 전체 배경 ===== */
@@ -208,6 +199,17 @@ footer {visibility: hidden;}
     padding: 0.5rem;
 }
 
+/* ===== Expander (사용법 안내) ===== */
+[data-testid="stExpander"] {
+    background: rgba(30, 27, 75, 0.4);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 12px;
+}
+[data-testid="stExpander"] summary {
+    color: #c4b5fd !important;
+    font-weight: 600;
+}
+
 /* ===== 데이터프레임 ===== */
 .stDataFrame {
     background: rgba(30, 27, 75, 0.4);
@@ -222,7 +224,6 @@ footer {visibility: hidden;}
     margin-top: 3rem;
     border-top: 1px solid rgba(168, 85, 247, 0.2);
 }
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -237,46 +238,25 @@ if "results" not in st.session_state:
     st.session_state.results = []
 
 # ============================================================
-# 사이드바 (사용법)
+# 상단: 헤더 + 우측 상단 초기화 버튼
 # ============================================================
-with st.sidebar:
-    st.markdown("### 📖 사용법")
+header_col1, header_col2 = st.columns([5, 1])
+
+with header_col1:
     st.markdown("""
-    **Step 1.** Sample 1 (미혼합 A) 이미지 업로드 → ROI 선택 → I₁ 확정  
-    **Step 2.** Sample 2 (미혼합 B) 이미지 업로드 → ROI 선택 → I₂ 확정  
-    **Step 3.** 혼합 이미지 업로드 → ROI 선택 → **MI 계산** 클릭  
-    """)
-    
-    st.markdown("---")
-    st.markdown("### 📐 MI 공식")
-    st.latex(r"MI = 1 - \frac{\sigma}{\sigma_{max}}")
-    st.latex(r"\sigma_{max} = \sqrt{\bar{c}(1-\bar{c})}")
-    
-    st.markdown("---")
-    st.markdown("### 🎯 MI 등급")
-    st.markdown("""
-    - 🟢 **0.9 ~ 1.0** : 우수 혼합  
-    - 🔵 **0.7 ~ 0.9** : 양호 혼합  
-    - 🟡 **0.5 ~ 0.7** : 부분 혼합  
-    - 🔴 **0.0 ~ 0.5** : 불량 혼합
-    """)
-    
-    st.markdown("---")
-    if st.button("🔄 전체 초기화"):
+    <div class="main-header">
+        <h1>🧪 Mixing Index (MI) Calculator</h1>
+        <p>재능대학교 바이오테크과 | 남정훈 교수 | v1.2 (2026)</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+with header_col2:
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("🔄 전체 초기화", key="reset_top", use_container_width=True):
         st.session_state.I1 = None
         st.session_state.I2 = None
         st.session_state.results = []
         st.rerun()
-
-# ============================================================
-# 헤더
-# ============================================================
-st.markdown("""
-<div class="main-header">
-    <h1>🧪 Mixing Index (MI) Calculator</h1>
-    <p>재능대학교 바이오테크과 | 남정훈 교수 | v1.2 (2026)</p>
-</div>
-""", unsafe_allow_html=True)
 
 # ============================================================
 # 진행 단계 표시
@@ -461,6 +441,36 @@ if st.session_state.results:
         file_name="MI_results.csv",
         mime="text/csv"
     )
+
+# ============================================================
+# 사용법 / 공식 / 등급 안내 (Expander - 접을 수 있음)
+# ============================================================
+st.markdown("---")
+
+exp_col1, exp_col2, exp_col3 = st.columns(3)
+
+with exp_col1:
+    with st.expander("📖 사용법"):
+        st.markdown("""
+        **Step 1.** Sample 1 (미혼합 A) 이미지 업로드 → ROI 선택 → **I₁ 확정**  
+        **Step 2.** Sample 2 (미혼합 B) 이미지 업로드 → ROI 선택 → **I₂ 확정**  
+        **Step 3.** 혼합 이미지 업로드 → ROI 선택 → **MI 계산** 클릭
+        """)
+
+with exp_col2:
+    with st.expander("📐 MI 공식"):
+        st.latex(r"MI = 1 - \frac{\sigma}{\sigma_{max}}")
+        st.latex(r"\sigma_{max} = \sqrt{\bar{c}(1-\bar{c})}")
+        st.markdown("σ: ROI 내 농도 표준편차 | c̄: 평균 농도")
+
+with exp_col3:
+    with st.expander("🎯 MI 등급"):
+        st.markdown("""
+        - 🟢 **0.9 ~ 1.0** : 우수 혼합  
+        - 🔵 **0.7 ~ 0.9** : 양호 혼합  
+        - 🟡 **0.5 ~ 0.7** : 부분 혼합  
+        - 🔴 **0.0 ~ 0.5** : 불량 혼합
+        """)
 
 # ============================================================
 # 푸터
