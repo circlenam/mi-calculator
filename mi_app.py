@@ -24,53 +24,58 @@ st.markdown("""
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 
-/* 상단 바 투명화 (사이드바 토글 버튼은 유지) */
+/* 상단 헤더는 유지하되 투명화 */
 [data-testid="stHeader"] {
     background: transparent !important;
-    backdrop-filter: blur(0px) !important;
+    height: 0px !important;
 }
 
-/* Fork 버튼 및 우측 툴바 숨기기 */
-[data-testid="stToolbar"] {
+/* Fork / Deploy / 우측 툴바 완전 숨김 */
+[data-testid="stToolbar"],
+[data-testid="stToolbarActions"],
+[data-testid="stDecoration"],
+[data-testid="stStatusWidget"],
+.stAppToolbar,
+.stAppDeployButton,
+.stActionButton {
     visibility: hidden !important;
     display: none !important;
 }
-[data-testid="stDecoration"] {
-    display: none !important;
-}
-.stAppToolbar {
-    display: none !important;
-}
-.stAppDeployButton {
-    display: none !important;
-}
 
-/* 사이드바 토글 버튼 - 보라색 강조 */
-[data-testid="stSidebarCollapsedControl"] {
-    background: linear-gradient(135deg, #6366f1, #a855f7) !important;
-    border-radius: 8px !important;
-    box-shadow: 0 0 15px rgba(168, 85, 247, 0.6) !important;
-    padding: 4px !important;
-}
-[data-testid="stSidebarCollapsedControl"] button svg,
-[data-testid="stSidebarCollapsedControl"] svg {
-    color: white !important;
-    fill: white !important;
-}
-
-/* ===== 전체 배경 (다크 그라데이션) ===== */
-.stApp {
-    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
-    color: #e2e8f0;
-}
-
-/* ===== 사이드바 ===== */
+/* ===== 사이드바를 항상 펼친 상태로 고정 ===== */
 [data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #1e1b4b 0%, #0f172a 100%);
-    border-right: 1px solid rgba(168, 85, 247, 0.2);
+    background: linear-gradient(180deg, #1e1b4b 0%, #0f172a 100%) !important;
+    border-right: 1px solid rgba(168, 85, 247, 0.3) !important;
+    min-width: 320px !important;
+    max-width: 320px !important;
+    transform: none !important;
+    visibility: visible !important;
+    display: block !important;
+    position: relative !important;
+}
+[data-testid="stSidebar"][aria-expanded="false"] {
+    margin-left: 0px !important;
+    transform: none !important;
 }
 [data-testid="stSidebar"] * {
     color: #e2e8f0 !important;
+}
+
+/* 사이드바 내부 닫기(X) 버튼 숨기기 - 항상 펼침이므로 불필요 */
+[data-testid="stSidebarCollapseButton"],
+[data-testid="stSidebarCollapsedControl"] {
+    display: none !important;
+}
+
+/* 사이드바 내부 컨텐츠 패딩 */
+[data-testid="stSidebarContent"] {
+    padding-top: 1rem !important;
+}
+
+/* ===== 전체 배경 ===== */
+.stApp {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+    color: #e2e8f0;
 }
 
 /* ===== 헤더 카드 ===== */
@@ -94,7 +99,7 @@ footer {visibility: hidden;}
     font-size: 1rem;
 }
 
-/* ===== 진행 단계 (Progress Circles) ===== */
+/* ===== 진행 단계 ===== */
 .progress-container {
     display: flex;
     justify-content: center;
@@ -217,6 +222,7 @@ footer {visibility: hidden;}
     margin-top: 3rem;
     border-top: 1px solid rgba(168, 85, 247, 0.2);
 }
+
 </style>
 """, unsafe_allow_html=True)
 
