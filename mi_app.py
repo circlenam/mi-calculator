@@ -1,5 +1,5 @@
 # mi_app.py
-# Mixing Index (MI) Calculator - Modern Web Version
+# Mixing Index (MI) Calculator - Dark Mode Premium
 # 재능대학교 바이오테크과 - 남정훈 교수 (개발자)
 
 import streamlit as st
@@ -12,7 +12,7 @@ import plotly.graph_objects as go
 # ===== 개발자 정보 =====
 DEVELOPER_NAME = "남정훈 교수"
 AFFILIATION    = "재능대학교 바이오테크과"
-VERSION        = "2.0"
+VERSION        = "2.0 Dark"
 YEAR           = "2026"
 
 # ===== 페이지 설정 =====
@@ -23,233 +23,403 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ===== 커스텀 CSS =====
+# ===== 다크모드 커스텀 CSS =====
 st.markdown("""
 <style>
-    /* 전체 배경 */
+    /* 전체 배경 - 다크 그라데이션 */
     .stApp {
-        background: linear-gradient(135deg, #f5f7fa 0%, #e8edf3 100%);
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+        color: #e2e8f0;
     }
     
-    /* 메인 컨테이너 패딩 */
+    /* 메인 컨테이너 */
     .block-container {
         padding-top: 2rem;
         padding-bottom: 2rem;
         max-width: 1400px;
     }
     
-    /* 헤더 스타일 */
+    /* 모든 텍스트 기본 색상 */
+    .stApp, .stApp p, .stApp label, .stApp span, .stApp div {
+        color: #e2e8f0;
+    }
+    .stApp h1, .stApp h2, .stApp h3, .stApp h4 {
+        color: #f1f5f9 !important;
+    }
+    
+    /* 헤더 - 네온 글로우 */
     .main-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
         padding: 2.5rem 2rem;
-        border-radius: 20px;
-        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+        border-radius: 24px;
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        box-shadow: 
+            0 0 60px rgba(99, 102, 241, 0.2),
+            inset 0 0 60px rgba(168, 85, 247, 0.05);
         margin-bottom: 2rem;
         text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .main-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+        animation: pulse 4s ease-in-out infinite;
+    }
+    @keyframes pulse {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 1; }
     }
     .main-header h1 {
-        color: white;
-        font-size: 2.5rem;
-        font-weight: 700;
+        font-size: 2.8rem;
+        font-weight: 800;
         margin: 0;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        letter-spacing: -0.5px;
+        background: linear-gradient(135deg, #a78bfa 0%, #22d3ee 50%, #f472b6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: -1px;
+        text-shadow: 0 0 80px rgba(167, 139, 250, 0.5);
+        position: relative;
+        z-index: 1;
     }
     .main-header p {
-        color: rgba(255,255,255,0.95);
+        color: #cbd5e1 !important;
         font-size: 1rem;
         margin: 0.8rem 0 0 0;
         font-weight: 300;
+        position: relative;
+        z-index: 1;
     }
     .main-header .badge {
         display: inline-block;
-        background: rgba(255,255,255,0.2);
-        padding: 4px 14px;
+        background: rgba(99, 102, 241, 0.2);
+        padding: 6px 16px;
         border-radius: 20px;
         margin: 0 5px;
         font-size: 0.85rem;
+        border: 1px solid rgba(99, 102, 241, 0.4);
         backdrop-filter: blur(10px);
+        color: #e0e7ff !important;
     }
     
-    /* 카드 스타일 */
+    /* 글래스 카드 */
     .step-card {
-        background: white;
+        background: rgba(30, 41, 59, 0.6);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
         padding: 1.8rem;
-        border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        border-radius: 20px;
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        box-shadow: 
+            0 8px 32px rgba(0, 0, 0, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
         margin-bottom: 1rem;
-        border-top: 4px solid #667eea;
-        transition: transform 0.2s, box-shadow 0.2s;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .step-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #6366f1, #a855f7, #22d3ee);
     }
     .step-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        transform: translateY(-4px);
+        border-color: rgba(99, 102, 241, 0.5);
+        box-shadow: 
+            0 20px 50px rgba(99, 102, 241, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
     }
     .step-number {
         display: inline-block;
-        background: linear-gradient(135deg, #667eea, #764ba2);
+        background: linear-gradient(135deg, #6366f1, #a855f7);
         color: white;
-        width: 32px;
-        height: 32px;
+        width: 36px;
+        height: 36px;
         border-radius: 50%;
         text-align: center;
-        line-height: 32px;
+        line-height: 36px;
         font-weight: bold;
-        margin-right: 10px;
+        margin-right: 12px;
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.6);
     }
     .step-title {
         font-size: 1.3rem;
         font-weight: 600;
-        color: #2d3748;
+        color: #f1f5f9 !important;
         margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
     }
     
     /* 상태 배지 */
     .status-pending {
-        background: #fef3c7;
-        color: #92400e;
-        padding: 6px 12px;
+        background: rgba(251, 191, 36, 0.15);
+        color: #fbbf24 !important;
+        padding: 6px 14px;
         border-radius: 20px;
         font-size: 0.85rem;
         font-weight: 500;
-        display: inline-block;
+        margin-left: auto;
+        border: 1px solid rgba(251, 191, 36, 0.3);
     }
     .status-done {
-        background: #d1fae5;
-        color: #065f46;
-        padding: 6px 12px;
+        background: rgba(16, 185, 129, 0.15);
+        color: #34d399 !important;
+        padding: 6px 14px;
         border-radius: 20px;
         font-size: 0.85rem;
         font-weight: 500;
-        display: inline-block;
+        margin-left: auto;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
     }
     
     /* MI 결과 카드 */
     .mi-result-card {
-        background: white;
-        padding: 2rem;
-        border-radius: 20px;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+        backdrop-filter: blur(20px);
+        padding: 2.5rem 2rem;
+        border-radius: 24px;
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        box-shadow: 
+            0 0 40px rgba(99, 102, 241, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
         text-align: center;
         margin: 1rem 0;
     }
     .mi-value-big {
-        font-size: 4rem;
-        font-weight: 800;
+        font-size: 5rem;
+        font-weight: 900;
         margin: 0;
-        background: linear-gradient(135deg, #667eea, #764ba2);
+        background: linear-gradient(135deg, #a78bfa, #22d3ee);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+        background-clip: text;
         line-height: 1;
+        text-shadow: 0 0 60px rgba(167, 139, 250, 0.5);
+        letter-spacing: -2px;
     }
     .mi-label {
-        font-size: 0.9rem;
-        color: #6b7280;
+        font-size: 0.85rem;
+        color: #94a3b8 !important;
         text-transform: uppercase;
-        letter-spacing: 2px;
-        margin-top: 0.5rem;
+        letter-spacing: 3px;
+        margin-bottom: 1rem;
+        font-weight: 500;
     }
     
-    /* 버튼 스타일 */
+    /* 버튼 스타일 - 네온 글로우 */
     .stButton > button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
         color: white;
-        border: none;
-        padding: 0.6rem 1.5rem;
-        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 0.7rem 1.5rem;
+        border-radius: 12px;
         font-weight: 600;
         transition: all 0.3s;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        box-shadow: 
+            0 4px 20px rgba(99, 102, 241, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
         width: 100%;
     }
     .stButton > button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        box-shadow: 
+            0 8px 30px rgba(99, 102, 241, 0.6),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+    .stButton > button:active {
+        transform: translateY(0);
     }
     
     /* 다운로드 버튼 */
     .stDownloadButton > button {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+    }
+    .stDownloadButton > button:hover {
+        box-shadow: 0 8px 30px rgba(16, 185, 129, 0.6);
     }
     
-    /* 사이드바 */
+    /* 사이드바 - 다크 글래스 */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(20px);
+        border-right: 1px solid rgba(99, 102, 241, 0.2);
     }
     [data-testid="stSidebar"] .block-container {
         padding-top: 2rem;
     }
+    [data-testid="stSidebar"] h3 {
+        color: #a78bfa !important;
+        font-weight: 700;
+    }
+    [data-testid="stSidebar"] p, [data-testid="stSidebar"] li {
+        color: #cbd5e1 !important;
+    }
     
     /* 메트릭 박스 */
     .metric-box {
-        background: white;
-        padding: 1rem;
-        border-radius: 12px;
+        background: rgba(30, 41, 59, 0.6);
+        backdrop-filter: blur(10px);
+        padding: 1.2rem;
+        border-radius: 14px;
         text-align: center;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        border-left: 4px solid #667eea;
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        transition: all 0.3s;
+    }
+    .metric-box:hover {
+        border-color: rgba(99, 102, 241, 0.5);
+        box-shadow: 0 4px 20px rgba(99, 102, 241, 0.2);
     }
     .metric-box .label {
-        font-size: 0.75rem;
-        color: #9ca3af;
+        font-size: 0.7rem;
+        color: #94a3b8 !important;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 2px;
+        font-weight: 500;
     }
     .metric-box .value {
-        font-size: 1.4rem;
-        font-weight: 700;
-        color: #2d3748;
-        margin-top: 0.3rem;
+        font-size: 1.6rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #a78bfa, #22d3ee);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-top: 0.4rem;
     }
     
     /* 진행 표시기 */
-    .progress-bar {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 2rem;
-        position: relative;
-    }
-    .progress-step {
-        flex: 1;
-        text-align: center;
-        position: relative;
-    }
     .progress-circle {
-        width: 40px;
-        height: 40px;
+        width: 48px;
+        height: 48px;
         border-radius: 50%;
-        background: #e5e7eb;
-        color: #9ca3af;
-        line-height: 40px;
+        background: rgba(30, 41, 59, 0.8);
+        color: #64748b;
+        line-height: 48px;
         margin: 0 auto;
         font-weight: bold;
+        font-size: 1.1rem;
         transition: all 0.3s;
+        border: 2px solid rgba(99, 102, 241, 0.2);
     }
     .progress-circle.active {
-        background: linear-gradient(135deg, #667eea, #764ba2);
+        background: linear-gradient(135deg, #6366f1, #a855f7);
         color: white;
-        box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+        border-color: rgba(167, 139, 250, 0.6);
+        box-shadow: 
+            0 0 30px rgba(99, 102, 241, 0.6),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        animation: glow 2s ease-in-out infinite;
     }
     .progress-circle.done {
-        background: #10b981;
+        background: linear-gradient(135deg, #10b981, #06b6d4);
         color: white;
+        border-color: rgba(52, 211, 153, 0.6);
+        box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);
+    }
+    @keyframes glow {
+        0%, 100% { box-shadow: 0 0 30px rgba(99, 102, 241, 0.6); }
+        50% { box-shadow: 0 0 50px rgba(167, 139, 250, 0.8); }
+    }
+    
+    /* 파일 업로더 */
+    [data-testid="stFileUploader"] {
+        background: rgba(15, 23, 42, 0.5);
+        border: 2px dashed rgba(99, 102, 241, 0.3);
+        border-radius: 12px;
+        padding: 1rem;
+        transition: all 0.3s;
+    }
+    [data-testid="stFileUploader"]:hover {
+        border-color: rgba(99, 102, 241, 0.6);
+        background: rgba(15, 23, 42, 0.7);
+    }
+    [data-testid="stFileUploader"] section {
+        background: transparent !important;
+    }
+    [data-testid="stFileUploader"] button {
+        background: linear-gradient(135deg, #6366f1, #a855f7) !important;
+        color: white !important;
+        border: none !important;
+    }
+    
+    /* 데이터프레임 */
+    [data-testid="stDataFrame"] {
+        background: rgba(30, 41, 59, 0.6);
+        border-radius: 12px;
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        overflow: hidden;
+    }
+    
+    /* 알림 박스 */
+    [data-testid="stAlert"] {
+        background: rgba(30, 41, 59, 0.6) !important;
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        color: #e2e8f0 !important;
     }
     
     /* 푸터 */
     .footer {
         text-align: center;
         padding: 2rem 0 1rem 0;
-        color: #6b7280;
+        color: #64748b !important;
         font-size: 0.85rem;
-        border-top: 1px solid #e5e7eb;
+        border-top: 1px solid rgba(99, 102, 241, 0.2);
         margin-top: 3rem;
+    }
+    .footer strong {
+        background: linear-gradient(135deg, #a78bfa, #22d3ee);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    /* 캡션 */
+    .stApp .caption, [data-testid="caption"] {
+        color: #94a3b8 !important;
+    }
+    
+    /* LaTeX 수식 */
+    .katex {
+        color: #e2e8f0 !important;
     }
     
     /* 헤더 숨김 */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
+    
+    /* 스크롤바 */
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+    ::-webkit-scrollbar-track {
+        background: rgba(15, 23, 42, 0.5);
+    }
+    ::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #6366f1, #a855f7);
+        border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #818cf8, #c084fc);
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -257,11 +427,11 @@ st.markdown("""
 st.markdown(f"""
 <div class="main-header">
     <h1>🧪 Mixing Index Calculator</h1>
-    <p>마이크로믹서 혼합지수 분석 도구</p>
+    <p>✨ 마이크로믹서 혼합지수 분석 도구 ✨</p>
     <p style="margin-top:1rem;">
         <span class="badge">🏛️ {AFFILIATION}</span>
         <span class="badge">👨‍🏫 {DEVELOPER_NAME}</span>
-        <span class="badge">v{VERSION} ({YEAR})</span>
+        <span class="badge">⚡ v{VERSION} · {YEAR}</span>
     </p>
 </div>
 """, unsafe_allow_html=True)
@@ -280,31 +450,33 @@ step3_active = step1_done and step2_done
 c1, c2, c3 = st.columns(3)
 with c1:
     status = "done" if step1_done else "active"
+    color = "#34d399" if step1_done else "#a78bfa"
     st.markdown(f"""
     <div style='text-align:center;'>
         <div class='progress-circle {status}'>{"✓" if step1_done else "1"}</div>
-        <p style='margin-top:0.5rem;font-weight:500;color:{"#10b981" if step1_done else "#667eea"};'>샘플 1</p>
+        <p style='margin-top:0.6rem;font-weight:600;color:{color} !important;letter-spacing:1px;'>SAMPLE 1</p>
     </div>
     """, unsafe_allow_html=True)
 with c2:
     if step2_done:
-        status = "done"
+        status = "done"; color = "#34d399"
     elif step1_done:
-        status = "active"
+        status = "active"; color = "#a78bfa"
     else:
-        status = ""
+        status = ""; color = "#64748b"
     st.markdown(f"""
     <div style='text-align:center;'>
         <div class='progress-circle {status}'>{"✓" if step2_done else "2"}</div>
-        <p style='margin-top:0.5rem;font-weight:500;color:{"#10b981" if step2_done else "#667eea" if step1_done else "#9ca3af"};'>샘플 2</p>
+        <p style='margin-top:0.6rem;font-weight:600;color:{color} !important;letter-spacing:1px;'>SAMPLE 2</p>
     </div>
     """, unsafe_allow_html=True)
 with c3:
     status = "active" if step3_active else ""
+    color = "#a78bfa" if step3_active else "#64748b"
     st.markdown(f"""
     <div style='text-align:center;'>
         <div class='progress-circle {status}'>3</div>
-        <p style='margin-top:0.5rem;font-weight:500;color:{"#667eea" if step3_active else "#9ca3af"};'>혼합 이미지</p>
+        <p style='margin-top:0.6rem;font-weight:600;color:{color} !important;letter-spacing:1px;'>MIXED</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -314,10 +486,11 @@ st.write("")
 with st.sidebar:
     st.markdown("### 📖 사용 방법")
     st.markdown("""
-    **Step 1.** 순수 샘플 1 이미지 업로드 후 ROI 지정  
-    **Step 2.** 순수 샘플 2 이미지 업로드 후 ROI 지정  
-    **Step 3.** 혼합 이미지 업로드 후 ROI 지정 → MI 계산  
-    **Step 4.** 결과를 CSV로 다운로드
+    **Step 1** · 순수 샘플 1 업로드 + ROI  
+    **Step 2** · 순수 샘플 2 업로드 + ROI  
+    **Step 3** · 혼합 이미지 업로드 + ROI  
+    **Step 4** · MI 자동 계산 및 결과 확인  
+    **Step 5** · CSV 다운로드
     """)
     
     st.markdown("---")
@@ -328,16 +501,16 @@ with st.sidebar:
     st.latex(r"MI = 1 - \frac{\sigma}{\sigma_{max}}")
     
     st.markdown("---")
-    st.markdown("### 🎯 MI 해석")
+    st.markdown("### 🎯 MI 등급")
     st.markdown("""
-    - 🟢 **0.9 ~ 1.0**: 우수한 혼합
-    - 🟡 **0.7 ~ 0.9**: 양호한 혼합
-    - 🟠 **0.5 ~ 0.7**: 부분 혼합
-    - 🔴 **0.0 ~ 0.5**: 미흡한 혼합
+    🟢 **0.9 ~ 1.0** · 우수한 혼합  
+    🟡 **0.7 ~ 0.9** · 양호한 혼합  
+    🟠 **0.5 ~ 0.7** · 부분 혼합  
+    🔴 **0.0 ~ 0.5** · 미흡한 혼합
     """)
     
     st.markdown("---")
-    if st.button("🔄 초기화"):
+    if st.button("🔄 전체 초기화"):
         st.session_state.I1 = None
         st.session_state.I2 = None
         st.session_state.results = []
@@ -359,46 +532,52 @@ def compute_mi(mixed_arr, I1, I2):
         mi = max(0.0, min(1.0, mi))
     return mi, sigma, c_mean, sigma_max
 
-# ===== 게이지 차트 함수 =====
+# ===== 다크 게이지 차트 =====
 def create_gauge(mi_value):
     if mi_value >= 0.9:
-        color = "#10b981"
+        color = "#34d399"
     elif mi_value >= 0.7:
-        color = "#f59e0b"
+        color = "#fbbf24"
     elif mi_value >= 0.5:
         color = "#fb923c"
     else:
-        color = "#ef4444"
+        color = "#f87171"
     
     fig = go.Figure(go.Indicator(
         mode="gauge+number",
         value=mi_value * 100,
         domain={'x': [0, 1], 'y': [0, 1]},
-        number={'suffix': "%", 'font': {'size': 48, 'color': color}},
+        number={'suffix': "%", 'font': {'size': 52, 'color': color, 'family': "Arial Black"}},
         gauge={
-            'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "#9ca3af"},
-            'bar': {'color': color, 'thickness': 0.8},
-            'bgcolor': "white",
+            'axis': {
+                'range': [0, 100],
+                'tickwidth': 1,
+                'tickcolor': "#64748b",
+                'tickfont': {'color': "#94a3b8", 'size': 11}
+            },
+            'bar': {'color': color, 'thickness': 0.75},
+            'bgcolor': "rgba(30, 41, 59, 0.5)",
             'borderwidth': 2,
-            'bordercolor': "#e5e7eb",
+            'bordercolor': "rgba(99, 102, 241, 0.3)",
             'steps': [
-                {'range': [0, 50], 'color': '#fee2e2'},
-                {'range': [50, 70], 'color': '#fed7aa'},
-                {'range': [70, 90], 'color': '#fef3c7'},
-                {'range': [90, 100], 'color': '#d1fae5'}
+                {'range': [0, 50], 'color': 'rgba(248, 113, 113, 0.15)'},
+                {'range': [50, 70], 'color': 'rgba(251, 146, 60, 0.15)'},
+                {'range': [70, 90], 'color': 'rgba(251, 191, 36, 0.15)'},
+                {'range': [90, 100], 'color': 'rgba(52, 211, 153, 0.15)'}
             ],
             'threshold': {
-                'line': {'color': "#1f2937", 'width': 4},
-                'thickness': 0.75,
+                'line': {'color': "#a78bfa", 'width': 4},
+                'thickness': 0.85,
                 'value': 90
             }
         }
     ))
     fig.update_layout(
-        height=280,
-        margin=dict(l=20, r=20, t=20, b=20),
+        height=300,
+        margin=dict(l=20, r=20, t=30, b=20),
         paper_bgcolor="rgba(0,0,0,0)",
-        font={'family': "Arial"}
+        plot_bgcolor="rgba(0,0,0,0)",
+        font={'family': "Arial", 'color': "#e2e8f0"}
     )
     return fig
 
@@ -408,7 +587,7 @@ col1, col2, col3 = st.columns(3)
 # ----- 샘플 1 -----
 with col1:
     st.markdown('<div class="step-card">', unsafe_allow_html=True)
-    status_html = '<span class="status-done">✓ 완료</span>' if step1_done else '<span class="status-pending">대기 중</span>'
+    status_html = '<span class="status-done">✓ 완료</span>' if step1_done else '<span class="status-pending">⏳ 대기</span>'
     st.markdown(f"""
     <div class="step-title">
         <span class="step-number">1</span>순수 샘플 1 {status_html}
@@ -420,7 +599,7 @@ with col1:
         img1 = Image.open(file1).convert("L")
         st.caption("🖱️ ROI를 드래그로 지정하세요")
         cropped1 = st_cropper(img1.convert("RGB"), realtime_update=True,
-                              box_color="#667eea", aspect_ratio=None, key="c1")
+                              box_color="#a78bfa", aspect_ratio=None, key="c1")
         if st.button("✅ 샘플 1 확정", key="b1"):
             arr1 = np.array(cropped1.convert("L"), dtype=np.float64)
             st.session_state.I1 = float(np.mean(arr1))
@@ -438,7 +617,7 @@ with col1:
 # ----- 샘플 2 -----
 with col2:
     st.markdown('<div class="step-card">', unsafe_allow_html=True)
-    status_html = '<span class="status-done">✓ 완료</span>' if step2_done else '<span class="status-pending">대기 중</span>'
+    status_html = '<span class="status-done">✓ 완료</span>' if step2_done else '<span class="status-pending">⏳ 대기</span>'
     st.markdown(f"""
     <div class="step-title">
         <span class="step-number">2</span>순수 샘플 2 {status_html}
@@ -450,7 +629,7 @@ with col2:
         img2 = Image.open(file2).convert("L")
         st.caption("🖱️ ROI를 드래그로 지정하세요")
         cropped2 = st_cropper(img2.convert("RGB"), realtime_update=True,
-                              box_color="#764ba2", aspect_ratio=None, key="c2")
+                              box_color="#22d3ee", aspect_ratio=None, key="c2")
         if st.button("✅ 샘플 2 확정", key="b2"):
             arr2 = np.array(cropped2.convert("L"), dtype=np.float64)
             st.session_state.I2 = float(np.mean(arr2))
@@ -482,8 +661,8 @@ with col3:
             img3 = Image.open(file3).convert("L")
             st.caption("🖱️ ROI를 드래그로 지정하세요")
             cropped3 = st_cropper(img3.convert("RGB"), realtime_update=True,
-                                  box_color="#10b981", aspect_ratio=None, key="c3")
-            if st.button("🎯 MI 계산", key="b3"):
+                                  box_color="#34d399", aspect_ratio=None, key="c3")
+            if st.button("🎯 MI 계산하기", key="b3"):
                 arr3 = np.array(cropped3.convert("L"), dtype=np.float64)
                 result = compute_mi(arr3, st.session_state.I1, st.session_state.I2)
                 if result:
@@ -507,39 +686,33 @@ if st.session_state.results:
     mi_val = latest["MI"]
     
     st.markdown("---")
-    st.markdown("### 🎯 최신 분석 결과")
+    st.markdown("### ✨ 최신 분석 결과")
     
     res_col1, res_col2 = st.columns([1, 1])
     
     with res_col1:
-        # 등급 결정
         if mi_val >= 0.9:
-            grade = "🟢 우수"
-            grade_color = "#10b981"
+            grade = "🟢 우수"; grade_color = "#34d399"
         elif mi_val >= 0.7:
-            grade = "🟡 양호"
-            grade_color = "#f59e0b"
+            grade = "🟡 양호"; grade_color = "#fbbf24"
         elif mi_val >= 0.5:
-            grade = "🟠 부분"
-            grade_color = "#fb923c"
+            grade = "🟠 부분"; grade_color = "#fb923c"
         else:
-            grade = "🔴 미흡"
-            grade_color = "#ef4444"
+            grade = "🔴 미흡"; grade_color = "#f87171"
         
         st.markdown(f"""
         <div class="mi-result-card">
-            <div class="mi-label">Mixing Index</div>
+            <div class="mi-label">⚡ Mixing Index ⚡</div>
             <div class="mi-value-big">{mi_val:.4f}</div>
-            <div style="font-size:1.5rem;color:{grade_color};font-weight:600;margin-top:0.5rem;">
-                {grade} ({mi_val*100:.1f}%)
+            <div style="font-size:1.6rem;color:{grade_color} !important;font-weight:700;margin-top:0.8rem;text-shadow:0 0 20px {grade_color}66;">
+                {grade} · {mi_val*100:.1f}%
             </div>
-            <div style="margin-top:1rem;color:#6b7280;font-size:0.9rem;">
+            <div style="margin-top:1.2rem;color:#94a3b8 !important;font-size:0.9rem;">
                 📄 {latest['Filename']}
             </div>
         </div>
         """, unsafe_allow_html=True)
         
-        # 세부 메트릭
         m1, m2, m3 = st.columns(3)
         with m1:
             st.markdown(f"""
@@ -551,7 +724,7 @@ if st.session_state.results:
         with m2:
             st.markdown(f"""
             <div class="metric-box">
-                <div class="label">σ_max</div>
+                <div class="label">σ max</div>
                 <div class="value">{latest['Sigma_max']:.4f}</div>
             </div>
             """, unsafe_allow_html=True)
@@ -566,36 +739,42 @@ if st.session_state.results:
     with res_col2:
         st.plotly_chart(create_gauge(mi_val), use_container_width=True)
 
-# ===== 누적 결과 테이블 =====
+# ===== 누적 결과 =====
 st.markdown("---")
 st.markdown("### 📊 누적 분석 결과")
 
 if st.session_state.results:
     df = pd.DataFrame(st.session_state.results)
-    st.dataframe(df, use_container_width=True, hide_index=False)
+    st.dataframe(df, use_container_width=True)
     
-    # MI 추이 그래프
     if len(df) > 1:
         fig_trend = go.Figure()
         fig_trend.add_trace(go.Scatter(
             x=list(range(1, len(df)+1)),
             y=df["MI"],
             mode='lines+markers',
-            line=dict(color='#667eea', width=3),
-            marker=dict(size=12, color='#764ba2', line=dict(color='white', width=2)),
-            name='MI'
+            line=dict(color='#a78bfa', width=3),
+            marker=dict(size=14, color='#22d3ee', line=dict(color='#a78bfa', width=2)),
+            name='MI',
+            fill='tozeroy',
+            fillcolor='rgba(167, 139, 250, 0.1)'
         ))
-        fig_trend.add_hline(y=0.9, line_dash="dash", line_color="#10b981", 
-                           annotation_text="우수 기준 (0.9)")
+        fig_trend.add_hline(
+            y=0.9, line_dash="dash", line_color="#34d399",
+            annotation_text="우수 기준 (0.9)",
+            annotation_font_color="#34d399"
+        )
         fig_trend.update_layout(
-            title="MI 값 추이",
+            title=dict(text="MI 값 추이", font=dict(color="#f1f5f9", size=18)),
             xaxis_title="측정 순서",
             yaxis_title="Mixing Index",
             yaxis_range=[0, 1.05],
-            height=350,
-            plot_bgcolor="rgba(0,0,0,0)",
+            height=380,
+            plot_bgcolor="rgba(30, 41, 59, 0.3)",
             paper_bgcolor="rgba(0,0,0,0)",
-            font=dict(family="Arial", size=12)
+            font=dict(family="Arial", size=12, color="#cbd5e1"),
+            xaxis=dict(gridcolor="rgba(99, 102, 241, 0.2)", color="#cbd5e1"),
+            yaxis=dict(gridcolor="rgba(99, 102, 241, 0.2)", color="#cbd5e1")
         )
         st.plotly_chart(fig_trend, use_container_width=True)
     
@@ -608,6 +787,6 @@ else:
 st.markdown(f"""
 <div class="footer">
     © {YEAR} <strong>{DEVELOPER_NAME}</strong> · {AFFILIATION}<br>
-    <span style="font-size:0.8rem;">Mixing Index Calculator v{VERSION}</span>
+    <span style="font-size:0.8rem;color:#64748b;">Mixing Index Calculator · v{VERSION}</span>
 </div>
 """, unsafe_allow_html=True)
