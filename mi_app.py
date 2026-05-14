@@ -12,7 +12,7 @@ import plotly.graph_objects as go
 # ===== 개발자 정보 =====
 DEVELOPER_NAME = "남정훈 교수"
 AFFILIATION    = "재능대학교 바이오테크과"
-VERSION        = "2.1"
+VERSION        = "2.2"
 YEAR           = "2026"
 
 # ===== 페이지 설정 =====
@@ -81,7 +81,7 @@ st.markdown("""
         color: #e0e7ff !important;
     }
     
-    /* 단계 제목 (카드 없음) */
+    /* 단계 제목 */
     .step-header {
         display: flex;
         align-items: center;
@@ -191,6 +191,22 @@ st.markdown("""
     }
     [data-testid="stSidebar"] p, [data-testid="stSidebar"] li {
         color: #cbd5e1 !important;
+    }
+    
+    /* 사이드바 토글 버튼 - 강조 표시 */
+    [data-testid="stSidebarCollapsedControl"],
+    [data-testid="collapsedControl"] {
+        background: linear-gradient(135deg, #6366f1, #a855f7) !important;
+        border-radius: 8px !important;
+        padding: 6px !important;
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.7) !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+    [data-testid="stSidebarCollapsedControl"] svg,
+    [data-testid="collapsedControl"] svg {
+        color: white !important;
+        fill: white !important;
     }
     
     /* 메트릭 박스 */
@@ -303,10 +319,11 @@ st.markdown("""
     
     .katex { color: #e2e8f0 !important; }
     
+    /* 메인 메뉴와 푸터만 숨김 (header는 사이드바 버튼 있어서 유지) */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    header {visibility: hidden;}
     
+    /* 스크롤바 */
     ::-webkit-scrollbar { width: 10px; height: 10px; }
     ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); }
     ::-webkit-scrollbar-thumb {
@@ -475,10 +492,9 @@ def create_gauge(mi_value):
     )
     return fig
 
-# ===== 3개 컬럼 - 카드 없이 깔끔하게 =====
+# ===== 3개 컬럼 =====
 col1, col2, col3 = st.columns(3)
 
-# ----- 샘플 1 -----
 with col1:
     status_html = '<span class="status-done">✓ 완료</span>' if step1_done else '<span class="status-pending">⏳ 대기</span>'
     st.markdown(f"""
@@ -508,7 +524,6 @@ with col1:
         </div>
         """, unsafe_allow_html=True)
 
-# ----- 샘플 2 -----
 with col2:
     status_html = '<span class="status-done">✓ 완료</span>' if step2_done else '<span class="status-pending">⏳ 대기</span>'
     st.markdown(f"""
@@ -538,7 +553,6 @@ with col2:
         </div>
         """, unsafe_allow_html=True)
 
-# ----- 혼합 이미지 -----
 with col3:
     st.markdown(f"""
     <div class="step-header">
@@ -573,7 +587,7 @@ with col3:
                     })
                     st.rerun()
 
-# ===== 최신 결과 표시 =====
+# ===== 최신 결과 =====
 if st.session_state.results:
     latest = st.session_state.results[-1]
     mi_val = latest["MI"]
