@@ -6,7 +6,7 @@ import pandas as pd
 import plotly.graph_objects as go
 
 # ============================================================
-# 페이지 설정 (사이드바 완전 제거)
+# 페이지 설정
 # ============================================================
 st.set_page_config(
     page_title="MI Calculator",
@@ -20,17 +20,14 @@ st.set_page_config(
 # ============================================================
 st.markdown("""
 <style>
-/* ===== 기본 Streamlit UI 정리 ===== */
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 
-/* 상단 헤더 투명화 */
 [data-testid="stHeader"] {
     background: transparent !important;
     height: 0px !important;
 }
 
-/* Fork / Deploy / 우측 툴바 완전 숨김 */
 [data-testid="stToolbar"],
 [data-testid="stToolbarActions"],
 [data-testid="stDecoration"],
@@ -42,20 +39,16 @@ footer {visibility: hidden;}
     display: none !important;
 }
 
-/* ===== 사이드바 완전 제거 ===== */
 [data-testid="stSidebar"],
 [data-testid="stSidebarCollapseButton"],
 [data-testid="stSidebarCollapsedControl"],
-[data-testid="collapsedControl"] {
+[data-testid="collapsedControl"],
+section[data-testid="stSidebar"] {
     display: none !important;
     visibility: hidden !important;
     width: 0px !important;
 }
-section[data-testid="stSidebar"] {
-    display: none !important;
-}
 
-/* 메인 컨텐츠 전체 너비 사용 */
 .main .block-container {
     max-width: 100% !important;
     padding-left: 3rem !important;
@@ -63,13 +56,11 @@ section[data-testid="stSidebar"] {
     padding-top: 2rem !important;
 }
 
-/* ===== 전체 배경 ===== */
 .stApp {
     background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
     color: #e2e8f0;
 }
 
-/* ===== 헤더 카드 ===== */
 .main-header {
     background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #06b6d4 100%);
     padding: 2rem;
@@ -90,12 +81,20 @@ section[data-testid="stSidebar"] {
     font-size: 1rem;
 }
 
-/* ===== 진행 단계 ===== */
-.progress-container {
+/* 진행 단계 라인 (좌측 = 동그라미, 우측 = 버튼) */
+.progress-row {
     display: flex;
-    justify-content: center;
-    gap: 2rem;
+    justify-content: space-between;
+    align-items: center;
     margin: 1.5rem 0 2rem 0;
+    padding: 0 1rem;
+}
+.progress-circles {
+    display: flex;
+    gap: 2rem;
+    flex: 1;
+    justify-content: center;
+    margin-left: 150px; /* 버튼 너비만큼 보정해서 가운데 정렬 유지 */
 }
 .progress-circle {
     width: 50px;
@@ -121,7 +120,6 @@ section[data-testid="stSidebar"] {
     color: #94a3b8;
 }
 
-/* ===== 스텝 헤더 ===== */
 .step-header {
     color: #c4b5fd !important;
     font-size: 1.3rem;
@@ -131,7 +129,6 @@ section[data-testid="stSidebar"] {
     margin-bottom: 1rem;
 }
 
-/* ===== 메트릭 카드 ===== */
 .metric-box {
     background: rgba(30, 27, 75, 0.6);
     border: 1px solid rgba(168, 85, 247, 0.3);
@@ -151,7 +148,6 @@ section[data-testid="stSidebar"] {
     font-weight: bold;
 }
 
-/* ===== MI 결과 카드 ===== */
 .result-card {
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.15));
     border: 1px solid rgba(168, 85, 247, 0.4);
@@ -175,7 +171,6 @@ section[data-testid="stSidebar"] {
     margin-top: 0.5rem;
 }
 
-/* ===== 버튼 ===== */
 .stButton > button {
     background: linear-gradient(135deg, #6366f1, #a855f7);
     color: white;
@@ -191,7 +186,6 @@ section[data-testid="stSidebar"] {
     box-shadow: 0 6px 20px rgba(168, 85, 247, 0.5);
 }
 
-/* ===== 파일 업로더 ===== */
 [data-testid="stFileUploader"] {
     background: rgba(30, 27, 75, 0.4);
     border: 2px dashed rgba(168, 85, 247, 0.4);
@@ -199,7 +193,6 @@ section[data-testid="stSidebar"] {
     padding: 0.5rem;
 }
 
-/* ===== Expander (사용법 안내) ===== */
 [data-testid="stExpander"] {
     background: rgba(30, 27, 75, 0.4);
     border: 1px solid rgba(168, 85, 247, 0.3);
@@ -210,13 +203,11 @@ section[data-testid="stSidebar"] {
     font-weight: 600;
 }
 
-/* ===== 데이터프레임 ===== */
 .stDataFrame {
     background: rgba(30, 27, 75, 0.4);
     border-radius: 10px;
 }
 
-/* ===== 푸터 ===== */
 .footer {
     text-align: center;
     color: #64748b;
@@ -238,40 +229,41 @@ if "results" not in st.session_state:
     st.session_state.results = []
 
 # ============================================================
-# 상단: 헤더 + 우측 상단 초기화 버튼
+# 헤더
 # ============================================================
-header_col1, header_col2 = st.columns([5, 1])
+st.markdown("""
+<div class="main-header">
+    <h1>🧪 Mixing Index (MI) Calculator</h1>
+    <p>재능대학교 바이오테크과 | 남정훈 교수 | v1.3 (2026)</p>
+</div>
+""", unsafe_allow_html=True)
 
-with header_col1:
-    st.markdown("""
-    <div class="main-header">
-        <h1>🧪 Mixing Index (MI) Calculator</h1>
-        <p>재능대학교 바이오테크과 | 남정훈 교수 | v1.2 (2026)</p>
+# ============================================================
+# 진행 단계 + 우측 초기화 버튼 (같은 라인)
+# ============================================================
+step1_class = "progress-done" if st.session_state.I1 is not None else "progress-active"
+step2_class = "progress-done" if st.session_state.I2 is not None else ("progress-active" if st.session_state.I1 is not None else "progress-pending")
+step3_class = "progress-active" if (st.session_state.I1 is not None and st.session_state.I2 is not None) else "progress-pending"
+
+prog_col1, prog_col2, prog_col3 = st.columns([1, 4, 1])
+
+with prog_col2:
+    st.markdown(f"""
+    <div style="display:flex; justify-content:center; gap:2rem; align-items:center; padding-top:0.5rem;">
+        <div class="progress-circle {step1_class}">1</div>
+        <div class="progress-circle {step2_class}">2</div>
+        <div class="progress-circle {step3_class}">3</div>
     </div>
     """, unsafe_allow_html=True)
 
-with header_col2:
-    st.markdown("<br>", unsafe_allow_html=True)
+with prog_col3:
     if st.button("🔄 전체 초기화", key="reset_top", use_container_width=True):
         st.session_state.I1 = None
         st.session_state.I2 = None
         st.session_state.results = []
         st.rerun()
 
-# ============================================================
-# 진행 단계 표시
-# ============================================================
-step1_class = "progress-done" if st.session_state.I1 is not None else "progress-active"
-step2_class = "progress-done" if st.session_state.I2 is not None else ("progress-active" if st.session_state.I1 is not None else "progress-pending")
-step3_class = "progress-active" if (st.session_state.I1 is not None and st.session_state.I2 is not None) else "progress-pending"
-
-st.markdown(f"""
-<div class="progress-container">
-    <div class="progress-circle {step1_class}">1</div>
-    <div class="progress-circle {step2_class}">2</div>
-    <div class="progress-circle {step3_class}">3</div>
-</div>
-""", unsafe_allow_html=True)
+st.markdown("<br>", unsafe_allow_html=True)
 
 # ============================================================
 # MI 계산 함수
@@ -325,12 +317,41 @@ def create_gauge(mi):
     )
     return fig
 
+def create_trend_chart(results):
+    """MI 변화 추이 라인 차트"""
+    df = pd.DataFrame(results)
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=list(range(1, len(df) + 1)),
+        y=df["MI"] * 100,
+        mode='lines+markers',
+        line=dict(color='#a78bfa', width=3),
+        marker=dict(size=10, color='#06b6d4', line=dict(color='#a78bfa', width=2)),
+        name='MI (%)',
+        hovertemplate='측정 %{x}<br>MI: %{y:.2f}%<extra></extra>'
+    ))
+    # 기준선
+    fig.add_hline(y=90, line_dash="dash", line_color="rgba(16,185,129,0.5)", annotation_text="우수 (90%)", annotation_font_color="#10b981")
+    fig.add_hline(y=70, line_dash="dash", line_color="rgba(6,182,212,0.5)", annotation_text="양호 (70%)", annotation_font_color="#06b6d4")
+    fig.add_hline(y=50, line_dash="dash", line_color="rgba(234,179,8,0.5)", annotation_text="부분 (50%)", annotation_font_color="#eab308")
+    
+    fig.update_layout(
+        title=dict(text="📈 MI 변화 추이", font=dict(color='#c4b5fd', size=18)),
+        xaxis=dict(title="측정 순서", color='#94a3b8', gridcolor='rgba(168,85,247,0.1)'),
+        yaxis=dict(title="MI (%)", color='#94a3b8', gridcolor='rgba(168,85,247,0.1)', range=[0, 105]),
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(30,27,75,0.3)',
+        height=350,
+        margin=dict(l=40, r=40, t=60, b=40),
+        font=dict(color='#e2e8f0')
+    )
+    return fig
+
 # ============================================================
 # 3단계 워크플로우
 # ============================================================
 col1, col2, col3 = st.columns(3)
 
-# --- Step 1: Sample 1 ---
 with col1:
     st.markdown('<div class="step-header">📤 Step 1. Sample 1 (I₁)</div>', unsafe_allow_html=True)
     f1 = st.file_uploader("미혼합 A 이미지", type=["png","jpg","jpeg","bmp","tif"], key="f1")
@@ -350,7 +371,6 @@ with col1:
         </div>
         """, unsafe_allow_html=True)
 
-# --- Step 2: Sample 2 ---
 with col2:
     st.markdown('<div class="step-header">📤 Step 2. Sample 2 (I₂)</div>', unsafe_allow_html=True)
     f2 = st.file_uploader("미혼합 B 이미지", type=["png","jpg","jpeg","bmp","tif"], key="f2")
@@ -370,7 +390,6 @@ with col2:
         </div>
         """, unsafe_allow_html=True)
 
-# --- Step 3: Mixed Image ---
 with col3:
     st.markdown('<div class="step-header">🔬 Step 3. 혼합 이미지</div>', unsafe_allow_html=True)
     if st.session_state.I1 is None or st.session_state.I2 is None:
@@ -395,7 +414,7 @@ with col3:
                 st.rerun()
 
 # ============================================================
-# 최신 결과 카드
+# 최신 결과 카드 (Gauge 포함)
 # ============================================================
 if st.session_state.results:
     latest = st.session_state.results[-1]
@@ -426,13 +445,17 @@ if st.session_state.results:
         st.plotly_chart(create_gauge(latest["MI"]), use_container_width=True)
 
 # ============================================================
-# 누적 결과 테이블
+# 누적 결과 + 트렌드 차트
 # ============================================================
 if st.session_state.results:
     st.markdown("---")
     st.markdown('<div class="step-header">📋 누적 분석 결과</div>', unsafe_allow_html=True)
     df = pd.DataFrame(st.session_state.results)
     st.dataframe(df, use_container_width=True, hide_index=True)
+    
+    # 측정이 2개 이상이면 트렌드 차트 표시
+    if len(st.session_state.results) >= 2:
+        st.plotly_chart(create_trend_chart(st.session_state.results), use_container_width=True)
     
     csv = df.to_csv(index=False).encode("utf-8-sig")
     st.download_button(
@@ -443,7 +466,7 @@ if st.session_state.results:
     )
 
 # ============================================================
-# 사용법 / 공식 / 등급 안내 (Expander - 접을 수 있음)
+# 사용법 / 공식 / 등급 안내
 # ============================================================
 st.markdown("---")
 
@@ -477,6 +500,6 @@ with exp_col3:
 # ============================================================
 st.markdown("""
 <div class="footer">
-    © 2026 남정훈 교수 | 재능대학교 바이오테크과 | MI Calculator v1.2
+    © 2026 남정훈 교수 | 재능대학교 바이오테크과 | MI Calculator v1.3
 </div>
 """, unsafe_allow_html=True)
